@@ -1,5 +1,6 @@
 from re import search
 from turtle import clear
+import sys
 
 
 menu_options = {
@@ -50,14 +51,14 @@ def file_search(file):
     matched_lines = search_multiple_strings_in_file(file, ['authentication', 'password', 'token', '@ait.com'])
 
    
-
-    keyword_ttl = len(matched_lines)
+    keyword_ttl = 0
+    keyword_ttl += len(matched_lines)
 
     print('Total  instances of keywords observed :', keyword_ttl)
     # open a file (file_output.csv) and write a header
     with open('file_output.csv', 'a', encoding='utf8', newline='') as f:
         thewriter = writer(f)
-        header = ['Exposure Keyword', 'Line No.', 'Full Line', 'Keyword Instance Total']
+        header = ['Exposure Keyword', 'Line No.', 'Full Line', 'Filename', 'Keyword Instance Total']
         thewriter.writerow(header)
 
         for elem in matched_lines:
@@ -67,7 +68,7 @@ def file_search(file):
         
 
             print('Exposure keyword *',elem[0],'* has been identified on line', elem[1], '- Full line = ', elem[2])      
-            info_out = [exposure_keyword, line_num, full_line, keyword_ttl]            
+            info_out = [exposure_keyword, line_num, full_line, file, keyword_ttl]            
             thewriter.writerow(info_out)
 
     if __name__ == '__file_search__':
@@ -101,15 +102,21 @@ def option2():
     from pprint import pprint 
     
     try:
-        zip_file_to_search = input ("Enter Zip File to search: ")
+        
+        zip_file_to_search = ''
+        zip_file_to_search = input ("Enter Zip File to search: ")    
+        if zip_file_to_search.lower().endswith('.zip'):         
+            # specifying the zip file name
+            file_name = zip_file_to_search
+            ext_file_name = ""
+        #zip_folder_path = 'C:\projects\data_breach\zip'
+                   
     except:
-         print('Wrong input. Please Website url....')
+        print('Wrong input. Please enter a zip file....')
+        option2()
+        #sys.exit
         # Check what choice was entered and act accordingly
-    
-    # specifying the zip file name
-    file_name = zip_file_to_search
-    ext_file_name = ""
-    #zip_folder_path = 'C:\projects\data_breach\zip'
+   
     
     # opening the zip file in READ mode
     with ZipFile(file_name, 'r') as zip:
@@ -126,6 +133,7 @@ def option2():
         zip_files = [f for f in listdir('C:\projects\data_breach\zip') if isfile(join('C:\projects\data_breach\zip', f))]
         
         for ext_file_name in zip_files:
+            print('* Checking File: ' + ext_file_name)
             file_search(ext_file_name)
 
 
