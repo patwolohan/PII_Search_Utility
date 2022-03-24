@@ -1,0 +1,7 @@
+server name = server; URL=server.ait.com; authentication key = 124324235325
+token
+password = admin123
+pushkar@ait.com
+pat@ait.com
+rebecca@ait.com password = easyPass
+password = admin134
