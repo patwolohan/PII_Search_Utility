@@ -100,8 +100,14 @@ def option2():
     from os import listdir
     from pprint import pprint 
     
+    try:
+        zip_file_to_search = input ("Enter Zip File to search: ")
+    except:
+         print('Wrong input. Please Website url....')
+        # Check what choice was entered and act accordingly
+    
     # specifying the zip file name
-    file_name = "test_zip.zip"
+    file_name = zip_file_to_search
     ext_file_name = ""
     #zip_folder_path = 'C:\projects\data_breach\zip'
     
