@@ -1,6 +1,11 @@
+import array
+import numpy as np
 from re import search
 from turtle import clear
+from csv import writer
+import os
 import sys
+import csv
 
 
 menu_options = {
@@ -9,6 +14,12 @@ menu_options = {
     3: 'Web Scraping',
     4: 'Exit',
 }
+
+with open('file_output.csv', 'a+', encoding='utf8', newline='') as f:
+        thewriter = writer(f)  
+        header = ['Exposure Keyword', 'Line No.', 'Full Line', 'Filename', 'Keyword Instance Total']           
+        thewriter.writerow(header)
+        f.close()
 
 def check_if_string_in_file(file_name, string_to_search):
     """ Check if any line in the file contains given string """
@@ -39,7 +50,7 @@ def search_multiple_strings_in_file(file_name, list_of_strings):
     return list_of_results
     
 def file_search(file):
-    from csv import writer
+    
 
     print('*** Search for multiple strings in a file and get lines containing string along with line numbers ***')
     # search for given strings in the file 'C:\Users\rebec\OneDrive\Desktop\test.txt.txt"
@@ -47,29 +58,35 @@ def file_search(file):
     #         file_loc = input ("Enter file search location : ")
     # except:
     #      print('Wrong input. Please enter a file location....')
-        # Check what choice was entered and act accordingly
-    matched_lines = search_multiple_strings_in_file(file, ['authentication', 'password', 'token', '@ait.com'])
+    # Check what choice was entered and act accordingly 
 
-   
+    
+
+    matched_lines = search_multiple_strings_in_file(file, ['authentication', 'password', 'token', '@ait.com'])
+      
     keyword_ttl = 0
     keyword_ttl += len(matched_lines)
 
     print('Total  instances of keywords observed :', keyword_ttl)
     # open a file (file_output.csv) and write a header
-    with open('file_output.csv', 'a', encoding='utf8', newline='') as f:
-        thewriter = writer(f)
-        header = ['Exposure Keyword', 'Line No.', 'Full Line', 'Filename', 'Keyword Instance Total']
-        thewriter.writerow(header)
+   
+    with open('file_output.csv', 'a+', encoding='utf8', newline='') as f:
+        thewriter = writer(f)            
+       
+        exposure_keyword = ''
+        line_num = ''
+        full_line = ''
 
         for elem in matched_lines:
             exposure_keyword = elem[0]
-            line_num = elem[1]
+            line_num = str(elem[1])
             full_line = elem[2]
         
 
             print('Exposure keyword *',elem[0],'* has been identified on line', elem[1], '- Full line = ', elem[2])      
             info_out = [exposure_keyword, line_num, full_line, file, keyword_ttl]            
             thewriter.writerow(info_out)
+            
 
     if __name__ == '__file_search__':
         file_search()
@@ -125,12 +142,12 @@ def option2():
     
         # extracting all the files
         print('Extracting all the files now...')
-        zip.extractall('C:\projects\data_breach\zip')
+        zip.extractall('C:\_Projects\PII_Search_Utility')
         print('Done!')
 
-        print(os.listdir('C:\projects\data_breach\zip'))
+        print(os.listdir('C:\_Projects\PII_Search_Utility\zip'))
 
-        zip_files = [f for f in listdir('C:\projects\data_breach\zip') if isfile(join('C:\projects\data_breach\zip', f))]
+        zip_files = [f for f in listdir('C:\_Projects\PII_Search_Utility\zip') if isfile(join('C:\_Projects\PII_Search_Utility\zip', f))]
         
         for ext_file_name in zip_files:
             print('* Checking File: ' + ext_file_name)
@@ -175,8 +192,13 @@ def option3():
         thewriter.writerow(info)
 
 
+def option4():
+    print('Exiting search application')
+    #os.copy()
+    if os.path.exists('file_output.csv'):
+        os.remove('file_output.csv')
 
-
+    sys.exit(0)
 
 if __name__=='__main__':
     while(True):
@@ -194,7 +216,7 @@ if __name__=='__main__':
         elif option == 3:
             option3()
         elif option == 4:
-            print('Exiting Search Application')
-            exit()
+            #print('Exiting Search Application')
+            option4()
         else:
             print('Invalid option. Please enter a number between 1 and 4.')
