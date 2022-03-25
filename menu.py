@@ -59,10 +59,11 @@ def file_search(file):
     # except:
     #      print('Wrong input. Please enter a file location....')
     # Check what choice was entered and act accordingly 
-
+    
+    search_array = ['authentication', 'password', 'token', '@ait.com']
     
 
-    matched_lines = search_multiple_strings_in_file(file, ['authentication', 'password', 'token', '@ait.com'])
+    matched_lines = search_multiple_strings_in_file(file, search_array)
       
     keyword_ttl = 0
     keyword_ttl += len(matched_lines)
