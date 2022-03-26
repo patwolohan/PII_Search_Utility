@@ -12,7 +12,8 @@ menu_options = {
     1: 'File Search',
     2: 'Search Zip File',
     3: 'Web Scraping',
-    4: 'Exit',
+    4: 'Generate Report',
+    5: 'Exit',
 }
 
 with open('file_output.csv', 'a+', encoding='utf8', newline='') as f:
@@ -169,14 +170,11 @@ def option3():
      except:
          print('Wrong input. Please Website url....')
         # Check what choice was entered and act accordingly
-     
-     
-     # url  = "https://www.pararius.com/apartments/amsterdam?ac=1"
      page = requests.get(url)
-
-     soup = BeautifulSoup(page.content, 'html.parser')
-     #lists = soup.find_all('section', class_="listing-search-item")
+     soup = BeautifulSoup(page.content, 'html.parser')     
      lists = soup.get_text()
+
+     #lists = soup.find_all('section', class_="listing-search-item")
 
      with open('housing.csv', 'w', encoding='utf8', newline='') as f:
         thewriter = writer(f)
@@ -192,8 +190,34 @@ def option3():
         info = [title, location, price, area]
         thewriter.writerow(info)
 
-
 def option4():
+    # import libraries
+    import pandas as pd
+    import os
+
+    file = pd.read_csv("file_output.csv")
+    file.to_html("filedump.html")
+
+    #input file
+    f_in = open("filedump.html", "rt")
+    #output file to write the result to
+    f_out = open("report.html", "wt")
+
+    f_out.seek(0) #get to the first position
+    f_out.write('<head><link rel="stylesheet" href="styles.css"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><p class="heading">Summary Report of PII data</p>')
+
+
+    #for each line in the input file
+    for line in f_in:
+	    #read replace the string and write to output file
+	    f_out.write(line.replace('dataframe', 'GenericTable'))
+        #close input and output files
+    f_in.close()
+    f_out.close()
+
+    os.remove("filedump.html")
+        
+def option5():
     print('Exiting search application')
     #os.copy()
     if os.path.exists('file_output.csv'):
@@ -217,7 +241,10 @@ if __name__=='__main__':
         elif option == 3:
             option3()
         elif option == 4:
-            #print('Exiting Search Application')
+            #print('Generating Report')
             option4()
+        elif option == 5:
+            #print('Exiting Search Application')
+            option5()
         else:
             print('Invalid option. Please enter a number between 1 and 4.')
