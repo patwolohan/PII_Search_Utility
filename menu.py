@@ -1,5 +1,3 @@
-import array
-import numpy as np
 from re import search
 from turtle import clear
 from csv import writer
@@ -18,7 +16,7 @@ menu_options = {
 
 with open('file_output.csv', 'a+', encoding='utf8', newline='') as f:
         thewriter = writer(f)  
-        header = ['Exposure Keyword', 'Line No.', 'Full Line', 'Filename', 'Keyword Instance Total']           
+        header = ['Exposure Keyword', 'Line No.', 'Full Line', 'Filename', 'No. Keywords']           
         thewriter.writerow(header)
         f.close()
 
@@ -51,8 +49,9 @@ def search_multiple_strings_in_file(file_name, list_of_strings):
     return list_of_results
     
 def file_search(file):
-    
-
+    global keyword_file_ttl
+    keyword_file_ttl = 0
+    keyword_ttl = 0
     print('*** Search for multiple strings in a file and get lines containing string along with line numbers ***')
     # search for given strings in the file 'C:\Users\rebec\OneDrive\Desktop\test.txt.txt"
     # try:
@@ -66,10 +65,10 @@ def file_search(file):
 
     matched_lines = search_multiple_strings_in_file(file, search_array)
       
-    keyword_ttl = 0
-    keyword_ttl += len(matched_lines)
+   
+    keyword_ttl = keyword_ttl + len(matched_lines)
 
-    print('Total  instances of keywords observed :', keyword_ttl)
+    #print('Total  instances of keywords observed :', keyword_ttl)
     # open a file (file_output.csv) and write a header
    
     with open('file_output.csv', 'a+', encoding='utf8', newline='') as f:
@@ -83,11 +82,18 @@ def file_search(file):
             exposure_keyword = elem[0]
             line_num = str(elem[1])
             full_line = elem[2]
-        
+            # keyword_ttl = 0
+            # keyword_ttl += len(matched_lines)
+            keyword_file_ttl = keyword_ttl + 1
 
             print('Exposure keyword *',elem[0],'* has been identified on line', elem[1], '- Full line = ', elem[2])      
-            info_out = [exposure_keyword, line_num, full_line, file, keyword_ttl]            
+            info_out = [exposure_keyword, line_num, full_line, file, 1]            
             thewriter.writerow(info_out)
+            info_out_ttl = [" ", " ", " ", "File Keyword Total", keyword_ttl]
+
+    with open('file_output.csv', 'a+', encoding='utf8', newline='') as f:
+        thewriter = writer(f)            
+        thewriter.writerow(info_out_ttl)
             
 
     if __name__ == '__file_search__':
@@ -104,8 +110,16 @@ def print_menu():
         print (key, '--', menu_options[key] )
 
 def option1():
+    print('Search File')
+    if os.path.exists('file_output.csv'):
+        os.remove('file_output.csv')
+    if os.path.exists('report.html'):
+       os.remove('report.html')
+
+    print('File Search Example file: test.txt')
+
     try:
-        file_to_search = input ("File to search: ")
+        file_to_search = input ("Enter File to search: ")
     except:
          print('Wrong input. Please Website url....')
         # Check what choice was entered and act accordingly
@@ -113,13 +127,20 @@ def option1():
     
 def option2():
     print('Search Zip File')
+    
     # importing required modules
     from zipfile import ZipFile
     import os 
     from os.path import isfile, join
     from os import listdir
-    from pprint import pprint 
-    
+    from pprint import pprint
+
+    if os.path.exists('file_output.csv'):
+        os.remove('file_output.csv')
+    if os.path.exists('report.html'):
+       os.remove('report.html')
+
+    print('Zip Search Example file: test_zip.zip')
     try:
         
         zip_file_to_search = ''
@@ -159,40 +180,52 @@ def option2():
 
 
 def option3():
-     print('Scrape Website')
+    print('Scrape Website/HTML File')
      
-     from bs4 import BeautifulSoup
-     import requests
-     from csv import writer
+    from bs4 import BeautifulSoup
+    import requests
+    from csv import writer
+    import re
+    
+    if os.path.exists('file_output.csv'):
+        os.remove('file_output.csv')
+    if os.path.exists('report.html'):
+       os.remove('report.html')
+
+    print('Web Scrape Example file: test.html')
+    try:
+        url = input ("Enter website Search URL: ")
+    except:
+        print('Wrong input. Please Website url....')
+    # Check what choice was entered and act accordingly
      
-     try:
-            url = input ("Enter website Search URL: ")
-     except:
-         print('Wrong input. Please Website url....')
-        # Check what choice was entered and act accordingly
-     page = requests.get(url)
-     soup = BeautifulSoup(page.content, 'html.parser')     
-     lists = soup.get_text()
-
-     #lists = soup.find_all('section', class_="listing-search-item")
-
-     with open('housing.csv', 'w', encoding='utf8', newline='') as f:
+     
+    
+   
+    with open(url) as fp:
+        soup = BeautifulSoup(fp, 'html.parser')
+        # soup = BeautifulSoup(page.content, 'html.parser')
+        lists = soup.find_all('p')
+        fp.close()
+    
+    with open('file_output.csv', 'w', encoding='utf8', newline='') as f:
         thewriter = writer(f)
-        header = ['Title', 'Location', 'Price', 'Area']
+        header = ['Web Scrape - Exposed Keyword']
         thewriter.writerow(header)
 
-     for list in lists:
-        title = list.find('a', class_="listing-search-item__link--title").text.replace('\n', '')
-        location = list.find('div', class_="listing-search-item__location").text.replace('\n', '')
-        price = list.find('div', class_="listing-search-item__price").text.replace('\n', '')
-        area = list.find('li', class_="illustrated-features__item illustrated-features__item--surface-area").text.replace('\n', '')
-        
-        info = [title, location, price, area]
-        thewriter.writerow(info)
+        str_matches = [s for s in lists if s.__contains__("password") or ("authentication") or ("token") or ("@ait.com")]
+        for str_match in str_matches:
+
+            #clean = re.compile('<.*?>')
+            #str_match = re.sub(clean, '', str_match)
+            thewriter.writerow(str_match)
 
 def option4():
     # import libraries
+    import urllib
+    import urllib.request
     import pandas as pd
+    import subprocess
     import os
 
     file = pd.read_csv("file_output.csv")
@@ -211,18 +244,26 @@ def option4():
     for line in f_in:
 	    #read replace the string and write to output file
 	    f_out.write(line.replace('dataframe', 'GenericTable'))
-        #close input and output files
+    #close input and output files
     f_in.close()
     f_out.close()
 
     os.remove("filedump.html")
+    url = "C:\_Projects\PII_Search_Utility/report.html"
+    # or a file on your computer
+    # url = "/Users/yourusername/Desktop/index.html
+    try: # Windows Browser
+        os.startfile(url)
+    except: 
+        print('Wrong url input. Please enter Website url....')
         
 def option5():
     print('Exiting search application')
     #os.copy()
     if os.path.exists('file_output.csv'):
         os.remove('file_output.csv')
-
+    if os.path.exists('report.html'):
+       os.remove('report.html')
     sys.exit(0)
 
 if __name__=='__main__':
